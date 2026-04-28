@@ -25,6 +25,9 @@
         <pi.strategy>full</pi.strategy>
         <pi.timeout>300</pi.timeout>
         <pi.cmd>pi</pi.cmd>
+        <pi.skill></pi.skill>
+        <pi.skill.branch></pi.skill.branch>
+        <pi.skill.path></pi.skill.path>
     </properties>
 
     <dependencies>
@@ -64,6 +67,9 @@
                         <pi.strategy>${pi.strategy}</pi.strategy>
                         <pi.timeout>${pi.timeout}</pi.timeout>
                         <pi.cmd>${pi.cmd}</pi.cmd>
+                        <pi.skill>${pi.skill}</pi.skill>
+                        <pi.skill.branch>${pi.skill.branch}</pi.skill.branch>
+                        <pi.skill.path>${pi.skill.path}</pi.skill.path>
                     </systemPropertyVariables>
                     <!-- Long-running tests -->
                     <forkedProcessTimeoutInSeconds>3600</forkedProcessTimeoutInSeconds>
