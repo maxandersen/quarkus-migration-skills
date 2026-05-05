@@ -17,16 +17,16 @@
         <junit.version>5.12.2</junit.version>
         <surefire.version>3.5.2</surefire.version>
 
-        <!-- Override via -Dpi.provider and/or -Dpi.model.
+        <!-- Override via -Dai.provider and/or -Dai.model.
              Run: pi list-models
              See tests/README.md for provider setup instructions. -->
-        <pi.provider></pi.provider>
-        <pi.model></pi.model>
-        <pi.strategy>full</pi.strategy>
-        <pi.timeout>300</pi.timeout>
-        <pi.cmd>pi</pi.cmd>
-        <pi.skill></pi.skill>
-        <pi.skill.branch></pi.skill.branch>
+        <ai.provider></ai.provider>
+        <ai.model></ai.model>
+        <ai.strategy>full</ai.strategy>
+        <ai.timeout>300</ai.timeout>
+        <ai.cmd>pi</ai.cmd>
+        <ai.skill></ai.skill>
+        <ai.skill.branch></ai.skill.branch>
     </properties>
 
     <dependencies>
@@ -61,13 +61,13 @@
                     <useFile>false</useFile>
                     <!-- Pass config as system properties -->
                     <systemPropertyVariables>
-                        <pi.provider>${pi.provider}</pi.provider>
-                        <pi.model>${pi.model}</pi.model>
-                        <pi.strategy>${pi.strategy}</pi.strategy>
-                        <pi.timeout>${pi.timeout}</pi.timeout>
-                        <pi.cmd>${pi.cmd}</pi.cmd>
-                        <pi.skill>${pi.skill}</pi.skill>
-                        <pi.skill.branch>${pi.skill.branch}</pi.skill.branch>
+                        <ai.provider>${ai.provider}</ai.provider>
+                        <ai.model>${ai.model}</ai.model>
+                        <ai.strategy>${ai.strategy}</ai.strategy>
+                        <ai.timeout>${ai.timeout}</ai.timeout>
+                        <ai.cmd>${ai.cmd}</ai.cmd>
+                        <ai.skill>${ai.skill}</ai.skill>
+                        <ai.skill.branch>${ai.skill.branch}</ai.skill.branch>
                     </systemPropertyVariables>
                     <!-- Long-running tests -->
                     <forkedProcessTimeoutInSeconds>3600</forkedProcessTimeoutInSeconds>

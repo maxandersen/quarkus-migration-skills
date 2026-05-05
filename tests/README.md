@@ -95,7 +95,7 @@ pi --list-models gpt
 pi --print "Say hello"
 ```
 
-The output shows provider name and model ID — use these as `provider/model` for the `pi.model` property:
+The output shows provider name and model ID — use these as `provider/model` for the `ai.model` property:
 
 ```
 provider          model                          context  max-out
@@ -112,34 +112,37 @@ cd tests/
 # Run all in-repo test projects with default model
 mvn test
 
+# Select the agent to be used. Default is: pi
+mvn test -Dai.cmd=pi
+
 # Run a specific project
-mvn test -Dpi.project=spring-rest-api
+mvn test -Dai.project=spring-rest-api
 
 # Set provider only (uses provider's default model)
-mvn test -Dpi.provider=anthropic
-mvn test -Dpi.provider=google
-mvn test -Dpi.provider=openai
+mvn test -Dai.provider=anthropic
+mvn test -Dai.provider=google
+mvn test -Dai.provider=openai
 
 # Set model only (pi picks the provider via fuzzy matching)
-mvn test -Dpi.model=claude-sonnet-4-5-20250514
-mvn test -Dpi.model=gemini-2.5-pro
+mvn test -Dai.model=claude-sonnet-4-5-20250514
+mvn test -Dai.model=gemini-2.5-pro
 
 # Set both provider and model explicitly (recommended for CI)
-mvn test -Dpi.provider=anthropic -Dpi.model=claude-sonnet-4-5-20250514
-mvn test -Dpi.provider=google -Dpi.model=gemini-2.5-pro
-mvn test -Dpi.provider=openai -Dpi.model=gpt-4o
-mvn test -Dpi.provider=vertex-anthropic -Dpi.model=claude-sonnet-4-5@20250929
-mvn test -Dpi.provider=amazon-bedrock -Dpi.model=us.anthropic.claude-sonnet-4-20250514-v1:0
-mvn test -Dpi.provider=openrouter -Dpi.model=anthropic/claude-sonnet-4-5
+mvn test -Dai.provider=anthropic -Dai.model=claude-sonnet-4-5-20250514
+mvn test -Dai.provider=google -Dai.model=gemini-2.5-pro
+mvn test -Dai.provider=openai -Dai.model=gpt-4o
+mvn test -Dai.provider=vertex-anthropic -Dai.model=claude-sonnet-4-5@20250929
+mvn test -Dai.provider=amazon-bedrock -Dai.model=us.anthropic.claude-sonnet-4-20250514-v1:0
+mvn test -Dai.provider=openrouter -Dai.model=anthropic/claude-sonnet-4-5
 
 # Use compatibility migration strategy instead of full
-mvn test -Dpi.strategy=compatibility
+mvn test -Dai.strategy=compatibility
 
 # Override timeout (seconds)
-mvn test -Dpi.project=spring-petclinic -Dpi.timeout=900
+mvn test -Dai.project=spring-petclinic -Dai.timeout=900
 
 # Combine options
-mvn test -Dpi.project=spring-jpa-crud -Dpi.provider=anthropic -Dpi.model=claude-sonnet-4-5-20250514 -Dpi.timeout=600
+mvn test -Dai.project=spring-jpa-crud -Dai.provider=anthropic -Dai.model=claude-sonnet-4-5-20250514 -Dai.timeout=600
 ```
 
 ### Configuration Properties
@@ -148,39 +151,39 @@ All configuration via `-D` flags:
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `pi.provider` | *(pi default)* | Provider name (e.g. `anthropic`, `google`, `openai`, `vertex-anthropic`) |
-| `pi.model` | *(pi default)* | Model ID (e.g. `claude-sonnet-4-5-20250514`, `gemini-2.5-pro`) |
-| `pi.strategy` | `full` | Migration strategy: `full` or `compatibility` |
-| `pi.timeout` | `300` | Timeout per project in seconds |
-| `pi.cmd` | `pi` | Path to pi binary (if not on PATH) |
-| `pi.project` | *(all)* | Run only this project name |
-| `pi.skill` | *(from project.yaml)* | Skill to use: a local name (e.g. `spring-boot-to-quarkus`) or a GitHub URL |
-| `pi.skill.branch` | *(parsed from URL)* | Explicit branch — only needed when the branch name contains `/` and the URL has a subpath |
+| `ai.provider` | *(pi default)* | Provider name (e.g. `anthropic`, `google`, `openai`, `vertex-anthropic`) |
+| `ai.model` | *(pi default)* | Model ID (e.g. `claude-sonnet-4-5-20250514`, `gemini-2.5-pro`) |
+| `ai.strategy` | `full` | Migration strategy: `full` or `compatibility` |
+| `ai.timeout` | `300` | Timeout per project in seconds |
+| `ai.cmd` | `pi` | Path to pi binary (if not on PATH) |
+| `ai.project` | *(all)* | Run only this project name |
+| `ai.skill` | *(from project.yaml)* | Skill to use: a local name (e.g. `spring-boot-to-quarkus`) or a GitHub URL |
+| `ai.skill.branch` | *(parsed from URL)* | Explicit branch — only needed when the branch name contains `/` and the URL has a subpath |
 
 ### Selecting a skill
 
-`pi.skill` accepts a local skill name or a GitHub URL pasted directly from the browser:
+`ai.skill` accepts a local skill name or a GitHub URL pasted directly from the browser:
 
 ```bash
 # Local skill by name (looked up in skills/)
-mvn test -Dpi.skill=jakarta-ee-to-quarkus
+mvn test -Dai.skill=jakarta-ee-to-quarkus
 
 # Remote skill — paste the GitHub URL as-is
-mvn test -Dpi.skill=https://github.com/org/repo/tree/main/skills/custom-skill
+mvn test -Dai.skill=https://github.com/org/repo/tree/main/skills/custom-skill
 
 # Remote skill on a feature branch (branch name has no slashes — URL is unambiguous)
-mvn test -Dpi.skill=https://github.com/org/repo/tree/new-feature-branch/skills/custom-skill
+mvn test -Dai.skill=https://github.com/org/repo/tree/new-feature-branch/skills/custom-skill
 
-# Remote skill when branch name contains '/' — add pi.skill.branch to resolve ambiguity
-mvn test -Dpi.skill=https://github.com/org/repo/tree/branch/with/slashes/new-feature-skill \
-         -Dpi.skill.branch=branch/with/slashes
+# Remote skill when branch name contains '/' — add ai.skill.branch to resolve ambiguity
+mvn test -Dai.skill=https://github.com/org/repo/tree/branch/with/slashes/new-feature-skill \
+         -Dai.skill.branch=branch/with/slashes
 ```
 
 Remote clones are cached in `target/skills/` and cleaned with `mvn clean`.
 
-You can set `pi.provider`, `pi.model`, or both:
+You can set `ai.provider`, `ai.model`, or both:
 - **Neither** — pi uses its configured default provider and model
-- **Provider only** (`-Dpi.provider=anthropic`) — uses that provider's default model
+- **Provider only** (`-Dai.provider=anthropic`) — uses that provider's default model
 - **Model only** (`-Dpi.model=claude-sonnet-4-5-20250514`) — pi fuzzy-matches the provider (may be ambiguous if multiple providers offer the same model)
 - **Both** (`-Dpi.provider=anthropic -Dpi.model=claude-sonnet-4-5-20250514`) — explicit, recommended for CI
 

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>{@code pi.model} — model to use (default: vertex-anthropic/claude-sonnet-4-5@20250929)</li>
  *   <li>{@code pi.strategy} — migration strategy: full or compatibility (default: full)</li>
  *   <li>{@code pi.timeout} — timeout in seconds per project (default: 300)</li>
- *   <li>{@code pi.cmd} — path to pi binary (default: pi)</li>
+ *   <li>{@code ai.cmd} — path to pi binary (default: pi)</li>
  *   <li>{@code pi.project} — run only this project (default: all)</li>
  * </ul>
  *
@@ -51,18 +51,18 @@ class MigrationTest {
 
     // -- config from system properties --
 
-    static String piProvider() {
+    static String aiProvider() {
         return System.getProperty("pi.provider", "");
     }
 
-    static String piModel() {
-        return System.getProperty("pi.model", "");
+    static String aiModel() {
+        return System.getProperty("ai.model", "");
     }
 
     /** Display string for the provider/model combination. */
     static String piModelDisplay() {
-        String p = piProvider();
-        String m = piModel();
+        String p = aiProvider();
+        String m = aiModel();
         if (!p.isEmpty() && !m.isEmpty()) return p + "/" + m;
         if (!p.isEmpty()) return p + "/(default)";
         if (!m.isEmpty()) return m;
@@ -70,32 +70,32 @@ class MigrationTest {
     }
 
     static String piStrategy() {
-        return System.getProperty("pi.strategy", "full");
+        return System.getProperty("ai.strategy", "full");
     }
 
     static int piTimeout() {
-        return Integer.parseInt(System.getProperty("pi.timeout", "300"));
+        return Integer.parseInt(System.getProperty("ai.timeout", "300"));
     }
 
-    static String piCmd() {
-        return System.getProperty("pi.cmd", "pi");
+    static String aiCmd() {
+        return System.getProperty("ai.cmd", "pi");
     }
 
     static String piProject() {
-        return System.getProperty("pi.project", "");
+        return System.getProperty("ai.project", "");
     }
 
     /** Skill to use: a local name (looked up in skills/) or a GitHub URL. Overrides project.yaml. */
     static String piSkill() {
-        return System.getProperty("pi.skill", "");
+        return System.getProperty("ai.skill", "");
     }
 
     /**
-     * Explicit branch for pi.skill URLs. Only needed when the branch name contains '/' and
+     * Explicit branch for ai.skill URLs. Only needed when the branch name contains '/' and
      * the URL also has a subpath (e.g. tree/feature/my-branch/skills/my-skill). Ignored otherwise.
      */
     static String piSkillBranch() {
-        return System.getProperty("pi.skill.branch", "");
+        return System.getProperty("ai.skill.branch", "");
     }
 
     // -- discover test projects --
@@ -163,8 +163,8 @@ class MigrationTest {
     void migrate(ProjectConfig config, Path projectDir) throws Exception {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("PROJECT: " + config.name());
-        System.out.println("  provider: " + (piProvider().isEmpty() ? "(default)" : piProvider()));
-        System.out.println("  model:    " + (piModel().isEmpty() ? "(default)" : piModel()));
+        System.out.println("  provider: " + (aiProvider().isEmpty() ? "(default)" : aiProvider()));
+        System.out.println("  model:    " + (aiModel().isEmpty() ? "(default)" : aiModel()));
         System.out.println("  strategy: " + piStrategy());
         System.out.println("  timeout:  " + piTimeout() + "s");
         System.out.println("  checks:   " + config.checks());
@@ -174,8 +174,8 @@ class MigrationTest {
         Path workDir = prepareWorkDir(config, projectDir);
 
         // Build a run name: project_provider_model_strategy
-        String providerShort = piProvider().isEmpty() ? "default" : piProvider().replaceAll("[^a-zA-Z0-9-]", "-");
-        String modelShort = piModel().isEmpty() ? "default" : piModel().replaceAll("[^a-zA-Z0-9-]", "-");
+        String providerShort = aiProvider().isEmpty() ? "default" : aiProvider().replaceAll("[^a-zA-Z0-9-]", "-");
+        String modelShort = aiModel().isEmpty() ? "default" : aiModel().replaceAll("[^a-zA-Z0-9-]", "-");
         String runName = config.name() + "_" + providerShort + "_" + modelShort + "_" + piStrategy();
         Path outputDir = Path.of("target", "runs").toAbsolutePath();
 
@@ -194,7 +194,7 @@ class MigrationTest {
                 "Skill directory not found: " + skillPath);
 
         int timeout = config.timeout() > 0 ? config.timeout() : piTimeout();
-        PiRunner runner = new PiRunner(piCmd(), piProvider(), piModel(), skillPath, piStrategy(), timeout);
+        PiRunner runner = new PiRunner(aiCmd(), aiProvider(), aiModel(), skillPath, piStrategy(), timeout);
 
         System.out.println("  Running migration agent...");
         PiRunner.RunOutput output = runner.run(workDir, outputDir, runName);

@@ -336,7 +336,7 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
 
         List<String> cmd = new ArrayList<>();
         cmd.addAll(List.of("script", "-q", "/dev/null"));
-        cmd.add(piCmd);
+        cmd.add(aiCmd);
         cmd.addAll(List.of("--print", "--mode", "json"));
         cmd.addAll(List.of("--no-skills", "--no-prompt-templates"));
         cmd.addAll(List.of("--fork", migrationSessionFile));

@@ -44,15 +44,15 @@ cd tests/
 mvn test
 
 # Run a specific project
-mvn test -Dpi.project=spring-rest-api
+mvn test -Dai.project=spring-rest-api
 
 # Run with a specific provider/model
-mvn test -Dpi.provider=anthropic -Dpi.model=claude-sonnet-4-5-20250514
+mvn test -Dai.provider=anthropic -Dai.model=claude-sonnet-4-5-20250514
 
 # Compare across models
-mvn test -Dpi.provider=anthropic -Dpi.model=claude-sonnet-4-5-20250514
-mvn test -Dpi.provider=google -Dpi.model=gemini-2.5-pro
-mvn test -Dpi.provider=openai -Dpi.model=o3
+mvn test -Dai.provider=anthropic -Dai.model=claude-sonnet-4-5-20250514
+mvn test -Dai.provider=google -Dai.model=gemini-2.5-pro
+mvn test -Dai.provider=openai -Dai.model=o3
 ```
 
 ## Results
