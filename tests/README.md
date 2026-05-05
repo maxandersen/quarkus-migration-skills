@@ -154,6 +154,29 @@ All configuration via `-D` flags:
 | `pi.timeout` | `300` | Timeout per project in seconds |
 | `pi.cmd` | `pi` | Path to pi binary (if not on PATH) |
 | `pi.project` | *(all)* | Run only this project name |
+| `pi.skill` | *(from project.yaml)* | Skill to use: a local name (e.g. `spring-boot-to-quarkus`) or a GitHub URL |
+| `pi.skill.branch` | *(parsed from URL)* | Explicit branch — only needed when the branch name contains `/` and the URL has a subpath |
+
+### Selecting a skill
+
+`pi.skill` accepts a local skill name or a GitHub URL pasted directly from the browser:
+
+```bash
+# Local skill by name (looked up in skills/)
+mvn test -Dpi.skill=jakarta-ee-to-quarkus
+
+# Remote skill — paste the GitHub URL as-is
+mvn test -Dpi.skill=https://github.com/org/repo/tree/main/skills/custom-skill
+
+# Remote skill on a feature branch (branch name has no slashes — URL is unambiguous)
+mvn test -Dpi.skill=https://github.com/org/repo/tree/new-feature-branch/skills/custom-skill
+
+# Remote skill when branch name contains '/' — add pi.skill.branch to resolve ambiguity
+mvn test -Dpi.skill=https://github.com/org/repo/tree/branch/with/slashes/new-feature-skill \
+         -Dpi.skill.branch=branch/with/slashes
+```
+
+Remote clones are cached in `target/skills/` and cleaned with `mvn clean`.
 
 You can set `pi.provider`, `pi.model`, or both:
 - **Neither** — pi uses its configured default provider and model
