@@ -79,8 +79,9 @@ public class OpenCodeRunner extends AbstractRunner implements AgentRunner {
         return new RunOutput(exitCode,duration,null,null);
     }
 
-    public ReviewOutput review(String s, Path workDir, Path outputDir, String runName, Path skillPath,
-            Map<String, Boolean> checks) {
+    @Override
+    public ReviewOutput review(String sessionFile, Path projectDir, Path outputDir, String runName, Path skillPath,
+            Map<String, Boolean> checkResults) {
         return null;
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.quarkus.migration.runner.AgentRunner;
 import io.quarkus.migration.runner.OpenCodeRunner;
 import io.quarkus.migration.runner.PiRunner;
+import io.quarkus.migration.runner.RunnerRegistry;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -200,8 +201,7 @@ class MigrationTest {
                 "Skill directory not found: " + skillPath);
 
         int timeout = config.timeout() > 0 ? config.timeout() : aiTimeout();
-        //PiRunner runner = new PiRunner(aiCmd(), aiProvider(), aiModel(), skillPath, aiStrategy(), timeout, aiPrompt());
-        OpenCodeRunner runner = new OpenCodeRunner(aiCmd(), aiProvider(), aiModel(), skillPath, aiStrategy(), timeout, aiPrompt());
+        AgentRunner runner = RunnerRegistry.getRunner(aiCmd(), aiProvider(), aiModel(), skillPath, aiStrategy(), timeout, aiPrompt());
 
         System.out.printf("  Running migration agent: %s ...%n",aiCmd());
         AgentRunner.RunOutput output = runner.run(workDir, outputDir, runName);
