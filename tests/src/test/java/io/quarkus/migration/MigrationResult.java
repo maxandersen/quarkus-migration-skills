@@ -20,7 +20,7 @@ public class MigrationResult {
     private long totalTokens;
     private double totalCost;
     private int apiCalls;
-    private String sessionFile;
+    private List<String> sessionFiles;
     private String workDir;
     private String runName;
     private int aiExitCode;
@@ -81,8 +81,8 @@ public class MigrationResult {
     public int getApiCalls() { return apiCalls; }
     public void setApiCalls(int apiCalls) { this.apiCalls = apiCalls; }
 
-    public String getSessionFile() { return sessionFile; }
-    public void setSessionFile(List<String> sessionFiles) { this.sessionFile = sessionFile; }
+    public List<String> getSessionFiles() { return sessionFiles; }
+    public void setSessionFiles(List<String> sessionFiles) { this.sessionFiles = sessionFiles; }
 
     public String getWorkDir() { return workDir; }
     public void setWorkDir(String workDir) { this.workDir = workDir; }

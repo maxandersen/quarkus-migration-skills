@@ -206,12 +206,12 @@ class MigrationTest {
 
         result.setAiExitCode(output.exitCode());
         result.setDuration(output.duration());
-        result.setSessionFile(output.sessionFile());
+        result.setSessionFiles(output.sessionFiles());
 
         System.out.println("  Migration completed in " + output.duration().toSeconds() + "s (exit=" + output.exitCode() + ")");
 
         // 3. Extract usage stats from session
-        AgentRunner.UsageStats usage = runner.extractUsage(output.sessionFile());
+        AgentRunner.UsageStats usage = runner.extractUsage(output.sessionFiles());
         result.setTotalTokens(usage.totalTokens());
         result.setTotalCost(usage.totalCost());
         result.setApiCalls(usage.apiCalls());
@@ -238,7 +238,7 @@ class MigrationTest {
         // 5. Run skill review (separate pi session)
         // TODO: Iterate through the list of session file
         AgentRunner.ReviewOutput reviewOutput = runner.review(
-                output.sessionFile().getFirst(), workDir, outputDir, runName, skillPath, result.getChecks());
+                output.sessionFiles().getFirst(), workDir, outputDir, runName, skillPath, result.getChecks());
         result.setReview(reviewOutput.review());
         result.setReviewTokens(reviewOutput.usage().totalTokens());
         result.setReviewCost(reviewOutput.usage().totalCost());

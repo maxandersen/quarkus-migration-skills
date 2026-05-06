@@ -20,6 +20,22 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
         super(aiCmd, provider, model, skillPath, strategy, timeoutSeconds, prompt);
     }
 
+    @Override
+    void addModelArgs(List<String> cmd) {
+        boolean hasProvider = provider != null && !provider.isBlank();
+        boolean hasModel = model != null && !model.isBlank();
+
+        if (hasProvider && hasModel) {
+            cmd.add("--provider");
+            cmd.add(provider);
+            cmd.add("--model");
+            cmd.add(model);
+        } else if (hasModel) {
+            cmd.add("--model");
+            cmd.add(model);
+        }
+    }
+
     /**
      * Run the migration pi agent against the given project directory.
      * Streams structured JSON output to console in real-time.

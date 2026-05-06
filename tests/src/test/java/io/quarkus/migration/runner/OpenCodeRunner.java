@@ -25,6 +25,20 @@ public class OpenCodeRunner extends AbstractRunner implements AgentRunner {
         super(aiCmd, provider, model, skillPath, strategy, timeoutSeconds, prompt);
     }
 
+    @Override
+    void addModelArgs(List<String> cmd) {
+        boolean hasProvider = provider != null && !provider.isBlank();
+        boolean hasModel = model != null && !model.isBlank();
+
+        if (hasProvider && hasModel) {
+            cmd.add("-m");
+            cmd.add(provider + "/" + model);
+        } else if (hasModel) {
+            cmd.add("-m");
+            cmd.add(model);
+        }
+    }
+
     /**
      * Run the opencode agent against the given project directory. Streams structured JSON output to console in
      * real-time.

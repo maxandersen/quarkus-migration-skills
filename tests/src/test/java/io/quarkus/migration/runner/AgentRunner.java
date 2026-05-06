@@ -15,7 +15,7 @@ public interface AgentRunner {
                         String runName, Path skillPath,
                         Map<String, Boolean> checkResults) throws IOException, InterruptedException;
 
-    record RunOutput(int exitCode, Duration duration, List<String> sessionFile, String logFile) {}
+    record RunOutput(int exitCode, Duration duration, List<String> sessionFiles, String logFile) {}
     record UsageStats(long totalTokens, double totalCost, int apiCalls, String actualModel) {}
     record ReviewOutput(String review, UsageStats usage) {}
 }

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-public class AbstractRunner {
+public abstract class AbstractRunner {
     protected String aiCmd;
     protected String provider;
     protected String model;
@@ -37,18 +37,7 @@ public class AbstractRunner {
      * Add the model args to the command.
      * @param cmd The Ai command to be enriched with the provider/model
      */
-    protected void addModelArgs(List<String> cmd) {
-        boolean hasProvider = provider != null && !provider.isBlank();
-        boolean hasModel = model != null && !model.isBlank();
-
-        if (hasProvider && hasModel) {
-            cmd.add("-m");
-            cmd.add(provider + "/" + model);
-        } else if (hasModel) {
-            cmd.add("-m");
-            cmd.add(model);
-        }
-    }
+    abstract void addModelArgs(List<String> cmd);
 
     /**
      * Parse an ai session JSONL file to extract token usage and cost.
