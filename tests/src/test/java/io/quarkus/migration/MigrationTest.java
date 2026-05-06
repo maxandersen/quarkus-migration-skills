@@ -199,6 +199,8 @@ class MigrationTest {
                 "Skill directory not found: " + skillPath);
 
         int timeout = config.timeout() > 0 ? config.timeout() : aiTimeout();
+
+        // Select the agent from the Registry
         AgentRunner runner = RunnerRegistry.getRunner(aiCmd(), aiProvider(), aiModel(), skillPath, aiStrategy(), timeout, aiPrompt());
 
         System.out.printf("  Running migration agent: %s ...%n",aiCmd());
@@ -215,10 +217,15 @@ class MigrationTest {
         result.setTotalTokens(usage.totalTokens());
         result.setTotalCost(usage.totalCost());
         result.setApiCalls(usage.apiCalls());
+        result.setReviewTokens(usage.totalTokens());
+        result.setReviewCost(usage.totalCost());
+        result.setApiCalls(usage.apiCalls());
 
+        /*
         System.out.println("  Tokens: " + usage.totalTokens() +
                 "  Cost: $" + String.format("%.4f", usage.totalCost()) +
                 "  API calls: " + usage.apiCalls());
+         */
 
         // 4. Run checks
         MigrationChecks checks = new MigrationChecks(workDir);
@@ -235,13 +242,15 @@ class MigrationTest {
             }
         }
 
-        // 5. Run skill review (separate pi session)
-        // TODO: Iterate through the list of session file
+
+        /* TODO: To be reviewed and investigated: Do we need it ?
+        // 5. Run skill review (separate ai session)
         AgentRunner.ReviewOutput reviewOutput = runner.review(
                 output.sessionFiles().getFirst(), workDir, outputDir, runName, skillPath, result.getChecks());
         result.setReview(reviewOutput.review());
         result.setReviewTokens(reviewOutput.usage().totalTokens());
         result.setReviewCost(reviewOutput.usage().totalCost());
+         */
 
         // 6. Record result
         tracker.record(result);
