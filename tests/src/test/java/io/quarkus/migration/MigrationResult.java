@@ -3,6 +3,7 @@ package io.quarkus.migration;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,7 +82,7 @@ public class MigrationResult {
     public void setApiCalls(int apiCalls) { this.apiCalls = apiCalls; }
 
     public String getSessionFile() { return sessionFile; }
-    public void setSessionFile(String sessionFile) { this.sessionFile = sessionFile; }
+    public void setSessionFile(List<String> sessionFiles) { this.sessionFile = sessionFile; }
 
     public String getWorkDir() { return workDir; }
     public void setWorkDir(String workDir) { this.workDir = workDir; }

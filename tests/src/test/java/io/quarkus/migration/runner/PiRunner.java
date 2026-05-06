@@ -16,8 +16,6 @@ import java.util.concurrent.*;
  */
 public class PiRunner extends AbstractRunner implements AgentRunner {
 
-    private static final ObjectMapper JSON = new ObjectMapper();
-
     public PiRunner(String aiCmd, String provider, String model, Path skillPath, String strategy, int timeoutSeconds, String prompt) {
         super(aiCmd, provider, model, skillPath, strategy, timeoutSeconds, prompt);
     }
@@ -55,7 +53,7 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
         Path logFile = outputDir.resolve(runName + ".json.log");
         Path prettyFile = outputDir.resolve(runName + ".pretty.md");
 
-        System.out.println("  pi cwd:     " + projectDir);
+        System.out.println("  ai cwd:     " + projectDir);
         System.out.println("  output dir: " + outputDir);
         System.out.println("  run name:   " + runName);
         System.out.println();
@@ -114,6 +112,7 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
             int exitCode;
             if (!finished) {
                 System.out.println("\n  ⏰ TIMEOUT after " + timeoutSeconds + "s — killing pi");
+                process.descendants().forEach(ProcessHandle::destroyForcibly);
                 process.destroyForcibly();
                 process.waitFor(10, TimeUnit.SECONDS);
                 exitCode = -1;
@@ -144,150 +143,9 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
                 Files.copy(Path.of(sessionFile), sessionCopy, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            return new RunOutput(exitCode, duration, sessionFile, logFile.toString());
+            //TODO: iterate through the list
+            return new RunOutput(exitCode, duration, Collections.singletonList(sessionFile), logFile.toString());
         }
-    }
-
-    /** Print to both System.out and the pretty log file. */
-    private static void printBoth(String text, BufferedWriter prettyWriter) {
-        System.out.println(text);
-        try {
-            synchronized (prettyWriter) {
-                prettyWriter.write(text);
-                prettyWriter.newLine();
-                prettyWriter.flush();
-            }
-        } catch (IOException ignored) {}
-    }
-
-    /** Print (no newline) to both System.out and the pretty log file. */
-    private static void printBothRaw(String text, BufferedWriter prettyWriter) {
-        System.out.print(text);
-        System.out.flush();
-        try {
-            synchronized (prettyWriter) {
-                prettyWriter.write(text);
-                prettyWriter.flush();
-            }
-        } catch (IOException ignored) {}
-    }
-
-    /**
-     * Print a human-readable summary of a JSON streaming event.
-     * Focuses on high-level actions: tool calls, tool results, text output, turns.
-     */
-    private void printEvent(JsonNode event, BufferedWriter prettyWriter) {
-        String type = event.path("type").asText("");
-
-        switch (type) {
-            case "turn_start" -> printBoth("  ┌── turn", prettyWriter);
-
-            case "turn_end" -> printBoth("  └── turn end", prettyWriter);
-
-            case "message_start" -> {
-                String role = event.path("message").path("role").asText("");
-                if ("assistant".equals(role)) {
-                    printBoth("  │ 🤖 assistant:", prettyWriter);
-                }
-            }
-
-            case "message_end" -> {
-                JsonNode msg = event.path("message");
-                if ("assistant".equals(msg.path("role").asText(""))) {
-                    JsonNode usage = msg.path("usage");
-                    long tokens = usage.path("totalTokens").asLong(0);
-                    double cost = usage.path("cost").path("total").asDouble(0);
-                    if (tokens > 0) {
-                        printBoth(String.format("  │    [tokens: %d, cost: $%.4f]", tokens, cost), prettyWriter);
-                    }
-                }
-            }
-
-            case "message_update" -> {
-                JsonNode ae = event.path("assistantMessageEvent");
-                String aeType = ae.path("type").asText("");
-
-                switch (aeType) {
-                    case "text_delta" -> printBothRaw(ae.path("delta").asText(""), prettyWriter);
-                    case "text_end" -> printBoth("", prettyWriter);
-                    default -> {}
-                }
-            }
-
-            case "tool_execution_start" -> {
-                String toolName = event.path("toolName").asText("");
-                JsonNode args = event.path("args");
-
-                String line = switch (toolName) {
-                    case "bash" -> {
-                        String command = args.path("command").asText("");
-                        if (command.length() > 120) command = command.substring(0, 117) + "...";
-                        yield "  │ 🔧 bash: " + command;
-                    }
-                    case "edit" -> {
-                        String path = args.path("path").asText("");
-                        int edits = args.path("edits").size();
-                        yield "  │ 🔧 edit: " + path + " (" + edits + " edit" + (edits != 1 ? "s" : "") + ")";
-                    }
-                    case "write" -> "  │ 🔧 write: " + args.path("path").asText("");
-                    case "read" -> "  │ 🔧 read: " + args.path("path").asText("");
-                    default -> "  │ 🔧 " + toolName;
-                };
-                printBoth(line, prettyWriter);
-            }
-
-            case "tool_execution_end" -> {
-                JsonNode result = event.path("result");
-                if (result.path("isError").asBoolean(false)) {
-                    printBoth("  │ ❌ " + event.path("toolName").asText("") + " error", prettyWriter);
-                }
-            }
-
-            // Ignore: session, agent_start, thinking_*, etc.
-        }
-    }
-
-    /**
-     * Parse a pi session JSONL file to extract token usage and cost.
-     */
-    public static UsageStats extractUsage(String sessionFile) {
-        if (sessionFile == null) {
-            return new UsageStats(0, 0.0, 0, "unknown");
-        }
-
-        long totalTokens = 0;
-        double totalCost = 0.0;
-        int apiCalls = 0;
-        String actualModel = "unknown";
-
-        try (var reader = new BufferedReader(new FileReader(sessionFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                try {
-                    JsonNode entry = JSON.readTree(line);
-                    if ("message".equals(entry.path("type").asText())) {
-                        JsonNode msg = entry.path("message");
-                        if ("assistant".equals(msg.path("role").asText())) {
-                            JsonNode usage = msg.path("usage");
-                            totalTokens += usage.path("totalTokens").asLong(0);
-                            totalCost += usage.path("cost").path("total").asDouble(0.0);
-                            apiCalls++;
-
-                            if ("unknown".equals(actualModel)) {
-                                String provider = msg.path("provider").asText("?");
-                                String m = msg.path("model").asText("?");
-                                actualModel = provider + "/" + m;
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-        } catch (IOException e) {
-            // session file not found or unreadable
-        }
-
-        return new UsageStats(totalTokens, totalCost, apiCalls, actualModel);
     }
 
     /**
@@ -403,7 +261,8 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
                     .reduce((a, b) -> b)
                     .orElse(null);
         }
-        UsageStats reviewUsage = extractUsage(reviewSessionFile);
+        //TODO: iterate through the list
+        UsageStats reviewUsage = extractUsage(Collections.singletonList(reviewSessionFile));
 
         // Save review to file
         String review = reviewText.toString().trim();

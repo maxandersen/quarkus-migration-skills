@@ -9,5 +9,6 @@
 # OS
 .DS_Store
 
-# Pi sessions
+# AI sessions
 .pi/agent/sessions/
+.opencode

@@ -39,7 +39,7 @@ public enum RunnerRegistry {
         }
         RunnerRegistry registry = LOOKUP_MAP.get(aiCmd.toLowerCase().trim());
         if (registry == null) {
-            throw new IllegalArgumentException("No runner registered for key: " + aiCmd);
+            throw new IllegalArgumentException("No runner registered for the agent: " + aiCmd);
         }
         return registry.factory.create(aiCmd, provider, model, skillPath, strategy, timeoutSeconds, prompt);
     }

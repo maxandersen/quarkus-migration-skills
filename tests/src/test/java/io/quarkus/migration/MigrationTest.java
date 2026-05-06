@@ -3,8 +3,6 @@ package io.quarkus.migration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.quarkus.migration.runner.AgentRunner;
-import io.quarkus.migration.runner.OpenCodeRunner;
-import io.quarkus.migration.runner.PiRunner;
 import io.quarkus.migration.runner.RunnerRegistry;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -213,7 +211,7 @@ class MigrationTest {
         System.out.println("  Migration completed in " + output.duration().toSeconds() + "s (exit=" + output.exitCode() + ")");
 
         // 3. Extract usage stats from session
-        PiRunner.UsageStats usage = PiRunner.extractUsage(output.sessionFile());
+        AgentRunner.UsageStats usage = runner.extractUsage(output.sessionFile());
         result.setTotalTokens(usage.totalTokens());
         result.setTotalCost(usage.totalCost());
         result.setApiCalls(usage.apiCalls());
@@ -238,8 +236,9 @@ class MigrationTest {
         }
 
         // 5. Run skill review (separate pi session)
-        PiRunner.ReviewOutput reviewOutput = runner.review(
-                output.sessionFile(), workDir, outputDir, runName, skillPath, result.getChecks());
+        // TODO: Iterate through the list of session file
+        AgentRunner.ReviewOutput reviewOutput = runner.review(
+                output.sessionFile().getFirst(), workDir, outputDir, runName, skillPath, result.getChecks());
         result.setReview(reviewOutput.review());
         result.setReviewTokens(reviewOutput.usage().totalTokens());
         result.setReviewCost(reviewOutput.usage().totalCost());
