@@ -94,6 +94,9 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
         Files.createDirectories(outputDir);
         Path sessionDir = Files.createTempDirectory("pi-session-");
 
+        // Use the user's prompt or the one to be used for the migration test
+        var userPrompt = prompt.isEmpty() ? generateMigrationPrompt() : prompt;
+
         List<String> cmd = new ArrayList<>();
         // Pi requires a pseudo-TTY — use `script -q /dev/null` to provide one
         cmd.addAll(List.of("script", "-q", "/dev/null"));
@@ -110,7 +113,7 @@ public class PiRunner extends AbstractRunner implements AgentRunner {
 
         addModelArgs(cmd);
 
-        cmd.add(prompt);
+        cmd.add(userPrompt);
 
         Path logFile = outputDir.resolve(runName + ".json.log");
         Path prettyFile = outputDir.resolve(runName + ".pretty.md");
